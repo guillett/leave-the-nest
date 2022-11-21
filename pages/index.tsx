@@ -81,7 +81,6 @@ export default function Home() {
       return a
     }, {})
 
-    return
     const toF = onMastodonFollowing?.filter(i => !i.alreadyFollowedMastodonUser)
     const accounts = toF.map(i => {
       const {user, host} = getAccount(i.mastodonIds[0])
