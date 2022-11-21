@@ -35,7 +35,7 @@ export const authOptions = {
 			},
 			token: "https://mamot.fr/oauth/token",
 			userinfo: "https://mamot.fr/api/v1/accounts/verify_credentials",
-			clientId: process.env.MAMOT_ID
+			clientId: process.env.MAMOT_ID,
 			clientSecret: process.env.MAMOT_SECRET,
 			profile(profile) {
 				return {

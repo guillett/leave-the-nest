@@ -1,8 +1,8 @@
+// @ts-nocheck
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 
-import { getProviders, signIn, signOut, useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 
 import { addMastodonHandles } from "../lib/twitter.ts"
@@ -11,41 +11,8 @@ export default function Home() {
   const [twitterHandle, setTwitterHandle] = useState('1h0ma5')
   const [twitterInfo, setTwitterInfo] = useState()
   const [following, setFollowing] = useState()
+  const [mastodonId, setMastodonId] = useState()
   const [onMastodonFollowing, setOnMastodonFollowing] = useState()
-
-  const [providers, setProviders] = useState([])
-  const [accounts, setAccounts] = useState({})
-  useEffect(() => {
-    getProviders()
-    .then(p => {
-      setProviders(Object.values(p))
-    })
-  }, [])
-
-  const sessionDetails = useSession()
-  
-  useEffect(() => {
-    console.log("sessionDetails", sessionDetails)/*
-    const storedAccounts = JSON.parse(window.localStorage.getItem('accounts')) || []
-    console.log("storedAccounts", storedAccounts)
-
-    if (sessionDetails.data?.user?.email) {
-      const match = storedAccounts.find(e => e.user.email == sessionDetails.data.user.email)
-      if (!match) {
-        storedAccounts.push(sessionDetails.data)
-        window.localStorage.setItem('accounts', JSON.stringify(storedAccounts))
-      }
-    }
-    const accountMap = storedAccounts.reduce((a, v) => {
-      const [username, ...provider] = v.user.email.split("@", 2)
-      const sanitizedProvider = provider.join('@')
-      a[sanitizedProvider] = a[sanitizedProvider] || []
-      a[sanitizedProvider].push(v)
-      return a
-    }, {})
-
-    setAccounts(accountMap)//*/
-  }, [sessionDetails])//*/
 
 
   const fetchTwitterInfo = () => {
@@ -82,15 +49,13 @@ export default function Home() {
   const fetchMastodon = async () => {
     const fullname = twitterInfo?.data[0].mastodonIds[0]
     const {user, host} = getAccount(fullname)
+    setMastodonId({user, host})
 
     const response_l = await fetch(`https://${host}/api/v1/accounts/lookup?acct=${fullname}`)
     const json_l = await response_l.json()
 
     const response_f = await fetch(`https://${host}/api/v1/accounts/${json_l.id}/following?limit=1000`)
     const json_f = await response_f.json()
-
-    console.log(json_l)
-    console.log(json_f)
 
     const mastodonUserMap = json_f.reduce((a, v) => {
       const key = v.acct.includes('@') ? `@${v.acct}` : `@${v.acct}@${host}` 
@@ -115,7 +80,7 @@ export default function Home() {
       })
       return a
     }, {})
-    console.log(dd)
+
     return
     const toF = onMastodonFollowing?.filter(i => !i.alreadyFollowedMastodonUser)
     const accounts = toF.map(i => {
@@ -168,7 +133,7 @@ export default function Home() {
         { twitterInfo && (
           <>
             <div>
-            We found you on Twitter, your name is: "{twitterInfo?.data?.[0]?.name}".
+            We found you on Twitter, your name is: &quot;{twitterInfo?.data?.[0]?.name}&quot;.
             </div>
             <div>
               {
@@ -201,7 +166,7 @@ export default function Home() {
                   you are missing {onMastodonFollowing?.filter(i => !i.alreadyFollowedMastodonUser).length} accounts.
 
                   <button onClick={generateCSV}>Generate the file to import on Mastodon</button>
-                  <p>Now you can <a target="_blank" href="https://mamot.fr/settings/import">import and follow those accounts, all at once, here</a>.</p>
+                  <p>Now you can <a target="_blank" rel="noreferrer" href={`https://${mastodonId?.host}/settings/import`}>import and follow those accounts, all at once, here</a>.</p>
                 </>
                 )}
 

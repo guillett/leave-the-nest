@@ -1,6 +1,7 @@
-const f = field => field ? field.match(/(?<n>@?[\w\.]+@[\w\.]+)/g) || [] : []
+// @ts-nocheck
+const f = (field: string) => field ? field.match(/(?<n>@?[\w\.]+@[\w\.]+)/g) || [] : []
 
-export function addMastodonHandles(twitterData) {
+export function addMastodonHandles(twitterData: any) {
 	const pre = {}
 	if (twitterData?.includes) {
 		Object.keys(twitterData?.includes).forEach(type => {
