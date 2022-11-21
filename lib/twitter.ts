@@ -2,6 +2,7 @@
 const f = (field: string) => field ? field.match(/(?<n>@?[\w\.]+@[\w\.]+)/g) || [] : []
 
 export function addMastodonHandles(twitterData: any) {
+	const found = []
 	const pre = {}
 	if (twitterData?.includes) {
 		Object.keys(twitterData?.includes).forEach(type => {
@@ -15,6 +16,7 @@ export function addMastodonHandles(twitterData: any) {
 						f(u.title)
 						)))//*/
 					)
+				found.push(...i.mastodonIds)
 			})
 		})
 	}
@@ -24,5 +26,7 @@ export function addMastodonHandles(twitterData: any) {
 			...f(i.description),
 			//...(i.pinned_tweet_id ? pre?.tweets[i.pinned_tweet_id]?.mastodonIds : []),
 		)
+		found.push(...i.mastodonIds)
 	})
+	return found
 }

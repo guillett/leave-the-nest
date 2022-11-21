@@ -48,8 +48,28 @@ export default function Home() {
         return r.json()
       })
       .then(r => {
-        addMastodonHandles(r)
-        setFollowing(r)
+        const allHandles = addMastodonHandles(r)
+        // check domains
+
+        const domains = allHandles.map(h => getAccount(h)?.host)
+        const domainMap = domains.reduce((a, v) => {
+          a[v] = 1 + (a[v] || 0)
+          return a
+        }, {})
+        fetch('/api/mastodon/instances', {
+          method: "post",
+          body: JSON.stringify(Object.keys(domainMap))
+        })
+        .then(r => r.json())
+        .then(domainData => {
+          r.data.forEach(item => {
+            item.mastodonIds = item.mastodonIds.filter(id => {
+              const {host} = getAccount(id)
+              return domainData[host]
+            })
+          })
+          setFollowing(r)
+        })
       })
   }
 
