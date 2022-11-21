@@ -149,7 +149,7 @@ export default function Home() {
 
         { twitterInfo && (
           <>
-            <button onClick={fetchTwitterFollowing}>Get following</button>
+            <button onClick={fetchTwitterFollowing}>Get the list of people you follow on Twitter</button>
 
             { following && (<>
 
@@ -160,12 +160,19 @@ export default function Home() {
               </div>
 
               {twitterInfo?.data[0].mastodonIds?.length && (<>
-                  <button onClick={fetchMastodon}>Get already following on Mastodon with {twitterInfo?.data[0].mastodonIds[0]}</button>
-                  You already follow {onMastodonFollowing?.filter(i => i.alreadyFollowedMastodonUser).length} but
-                  you are missing {onMastodonFollowing?.filter(i => !i.alreadyFollowedMastodonUser).length} accounts.
+                  <button onClick={fetchMastodon}>Get the list of people you already follow on Mastodon with {twitterInfo?.data[0].mastodonIds[0]}</button>
+                  { onMastodonFollowing && (
+                    <>
+                      You already follow {onMastodonFollowing?.filter(i => i.alreadyFollowedMastodonUser).length} but
+                      you are missing {onMastodonFollowing?.filter(i => !i.alreadyFollowedMastodonUser).length} accounts.
 
-                  <button onClick={generateCSV}>Generate the file to import on Mastodon</button>
-                  <p>Now you can <a target="_blank" rel="noreferrer" href={`https://${mastodonId?.host}/settings/import`}>import and follow those accounts, all at once, here</a>.</p>
+                      <button onClick={generateCSV}>Generate the file to import on Mastodon</button>
+                      <div>
+                      Now you can <a target="_blank" rel="noreferrer" href={`https://${mastodonId?.host}/settings/import`}>import and follow those accounts, all at once, here</a>.
+                      </div>
+                    </>
+                    )
+                  }
                 </>
                 )}
 
