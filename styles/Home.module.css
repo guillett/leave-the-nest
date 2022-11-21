@@ -127,3 +127,6 @@
     filter: invert(1);
   }
 }
+.logins {
+  display: flex;
+}

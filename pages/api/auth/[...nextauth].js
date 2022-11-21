@@ -1,8 +1,15 @@
 import NextAuth from "next-auth"
 import TwitterProvider from "next-auth/providers/twitter"
+import { MongoDBAdapter } from "@next-auth/mongodb-adapter"
+
+import clientPromise from "../../../lib/mongodb.ts"
+
+const mongoAdapter = MongoDBAdapter(clientPromise, {
+    databaseName: 'leave-the-nest'
+})
 
 export const authOptions = {
-  // Configure one or more authentication providers
+    adapter: mongoAdapter,
 	providers: [
 		TwitterProvider({
 			clientId: process.env.TWITTER_ID,
@@ -11,13 +18,12 @@ export const authOptions = {
 			profile(profile) {
 				console.log('twitter profile', profile)
 				return {
+					email: profile.data.username + "@twitter",
 					id: profile.data.id,
-					email: "@" + profile.data.username + "@twitter.com",
-					userId: "@" + profile.data.username + "@twitter.com",
-					name: profile.data.name,
 					image: profile.data.profile_image_url,
+					name: profile.data.name,
 				}
-			}
+			},
 		}),
 		{
 			id: "mastodon@mamot.fr",
@@ -29,34 +35,41 @@ export const authOptions = {
 			},
 			token: "https://mamot.fr/oauth/token",
 			userinfo: "https://mamot.fr/api/v1/accounts/verify_credentials",
-			clientId: "zSy4UmoiCxGjonyOzqFS0OJBOCJuKPxzx5N3ZhrtFUs",
-			clientSecret: "IVyxEvSzMaiBQ8WjoPxq5xPiWW7ECP33lcQI724l6xM",
+			clientId: process.env.MAMOT_ID
+			clientSecret: process.env.MAMOT_SECRET,
 			profile(profile) {
-				console.log('mastodon profile', profile)
 				return {
+					email: profile.username + '@mastodon@mamot.fr',
 					id: profile.id,
-					name: profile.display_name,
-					username: profile.username,
 					image: profile.avatar,
-					email: '@' + profile.username + '@mamot.fr'
+					username: profile.username,
 				}
 			},
 		}
 	],
+	events: {
+		async linkAccount({user, account, profile}) {
+			console.log('linkAccount', {user, account, profile})
+			const accounts = {
+				...(user.accounts|| {}),
+				[account.provider]: {
+					id: account.providerAccountId,
+					profile
+				}
+			}
+		  await mongoAdapter.updateUser({id: user.id, accounts})
+		}
+	},
 	callbacks: {
-		signIn({ user, account, profile, email, credentials }) {
-			console.log('signIn', { user, account, profile, email, credentials })
+		async signIn({ user, account, profile, email, credentials }) {
+		  console.log(user)
 	      return true
-	    },/*
-	    session(params) {
-	    	console.log('session params', params)
-	    	return params.session
-	    }//*/
-	     session({session, token, user}) {
-	    	console.log('session {session, token, user}', {session, token, user})
+	    },
+	    async session({session, token, user}) {
+	    	console.log('session', {session, token, user})
+	    	session.user = user
 	    	return session
-	    }//*/
-
+	    }
 	}
 }
 
