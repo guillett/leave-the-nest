@@ -58,7 +58,7 @@ export default async function handler(
       search.set("user.fields", "id,description,public_metrics,location,username,url,name,created_at,pinned_tweet_id,entities")
       search.set("expansions", "pinned_tweet_id")
       search.set("tweet.fields", "context_annotations,entities,geo,id")
-      fetch(`https://api.twitter.com/2/users/${twitterId}/following?${search}`,
+      return fetch(`https://api.twitter.com/2/users/${twitterId}/following?${search}`,
       {
         headers: {
           authorization: `bearer ${process.env.TWITTER_BEARER}`
@@ -82,7 +82,6 @@ export default async function handler(
         console.log('err', e)
         return res.status(500).json(e)
       })
-      return
     }
   }
 }

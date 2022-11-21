@@ -11,9 +11,17 @@ export default function Home() {
   const [twitterHandle, setTwitterHandle] = useState('1h0ma5')
   const [twitterInfo, setTwitterInfo] = useState()
   const [following, setFollowing] = useState()
+  const [mastodonHandle, setMastodonHandle] = useState('')
   const [mastodonId, setMastodonId] = useState()
   const [onMastodonFollowing, setOnMastodonFollowing] = useState()
 
+  const getAccount = (fullname) => {
+    const comps = fullname.split('@')
+    if (!comps[0].length) {
+      comps.shift()
+    }
+    return {user: comps?.[0], host: comps?.[1], acct: `${comps?.[0]}@${comps?.[1]}`}
+  }
 
   const fetchTwitterInfo = () => {
     fetch(`/api/twitter/details/${twitterHandle}`)
@@ -24,6 +32,13 @@ export default function Home() {
         const data = {...r, data: [r.data]}
         addMastodonHandles(data)
         setTwitterInfo(data)
+
+        const fullname = data.data[0].mastodonIds?.[0]
+        if (fullname) {
+          setMastodonId(getAccount(fullname))
+        } else {
+          setMastodonId()
+        }
       })
   }
 
@@ -38,27 +53,21 @@ export default function Home() {
       })
   }
 
-  const getAccount = (fullname) => {
-    const comps = fullname.split('@')
-    if (!comps[0].length) {
-      comps.shift()
-    }
-    return {user: comps?.[0], host: comps?.[1]}
+  const explicitMastodonHandle = () => {
+    const acct = getAccount(mastodonHandle)
+    setMastodonId(acct)
+    fetchMastodon(acct)
   }
 
-  const fetchMastodon = async () => {
-    const fullname = twitterInfo?.data[0].mastodonIds[0]
-    const {user, host} = getAccount(fullname)
-    setMastodonId({user, host})
-
-    const response_l = await fetch(`https://${host}/api/v1/accounts/lookup?acct=${fullname}`)
+  const fetchMastodon = async (mastodonId) => {
+    const response_l = await fetch(`https://${mastodonId.host}/api/v1/accounts/lookup?acct=${mastodonId.acct}`)
     const json_l = await response_l.json()
 
-    const response_f = await fetch(`https://${host}/api/v1/accounts/${json_l.id}/following?limit=1000`)
+    const response_f = await fetch(`https://${mastodonId.host}/api/v1/accounts/${json_l.id}/following?limit=1000`)
     const json_f = await response_f.json()
 
     const mastodonUserMap = json_f.reduce((a, v) => {
-      const key = v.acct.includes('@') ? `@${v.acct}` : `@${v.acct}@${host}` 
+      const key = v.acct.includes('@') ? `@${v.acct}` : `@${v.acct}@${mastodonId.host}`
       a[key] = v
       return a
     }, {})
@@ -83,8 +92,8 @@ export default function Home() {
 
     const toF = onMastodonFollowing?.filter(i => !i.alreadyFollowedMastodonUser)
     const accounts = toF.map(i => {
-      const {user, host} = getAccount(i.mastodonIds[0])
-      return `${user}@${host}`  
+      const {acct} = getAccount(i.mastodonIds[0])
+      return acct
     })
     const rows = accounts.map(i => `${i},true`)
     const file = new File([
@@ -121,24 +130,24 @@ export default function Home() {
         </h1>
 
         <h2>1. Give us your Twitter handle</h2>
-        <div>
-          <label htmlFor="twitter-handle">Twitter handle</label>
-          <input id="twitter-handle" value={twitterHandle} onChange={e => setTwitterHandle(e.target.value)} />
-          <button onClick={fetchTwitterInfo}>Get id</button>
-        </div>
 
-        
+
+        <label htmlFor="twitter-handle">What is your Twitter handle?</label>
+        <input id="twitter-handle" value={twitterHandle}
+          onKeyPress={e => { if (e.charCode == 13) { fetchTwitterInfo() }}}
+          onChange={e => setTwitterHandle(e.target.value)} />
+        <button onClick={fetchTwitterInfo}>Get your info on Twitter</button>
 
         { twitterInfo && (
           <>
             <div>
-            We found you on Twitter, your name is: &quot;{twitterInfo?.data?.[0]?.name}&quot;.
+            We found you on Twitter, your name is: &quot;{twitterInfo?.data?.[0]?.name}&quot;
             </div>
             <div>
               {
-                twitterInfo?.data[0].mastodonIds?.length ?
-                  `We managed to extract your Mastodon account: "${twitterInfo?.data[0].mastodonIds[0]}".` :
-                  `We didn't managed a Mastodon account from your public data.`  
+                mastodonId && (!mastodonHandle.length) ?
+                  `We managed to extract your Mastodon account: "${mastodonId.acct}"` :
+                  `We didn't managed a Mastodon account from your public data.`
               }
             </div>
            </>
@@ -159,21 +168,30 @@ export default function Home() {
                 already on Mastodon.
               </div>
 
-              {twitterInfo?.data[0].mastodonIds?.length && (<>
-                  <button onClick={fetchMastodon}>Get the list of people you already follow on Mastodon with {twitterInfo?.data[0].mastodonIds[0]}</button>
+              {mastodonId ? (<>
+                  <button onClick={() => fetchMastodon(mastodonId)}>Get the list of people you already follow on Mastodon with {mastodonId.acct}</button>
                   { onMastodonFollowing && (
                     <>
-                      You already follow {onMastodonFollowing?.filter(i => i.alreadyFollowedMastodonUser).length} but
-                      you are missing {onMastodonFollowing?.filter(i => !i.alreadyFollowedMastodonUser).length} accounts.
+                      You already follow {onMastodonFollowing?.filter(i => i.alreadyFollowedMastodonUser).length} accounts but
+                      you are missing {onMastodonFollowing?.filter(i => !i.alreadyFollowedMastodonUser).length}.
 
                       <button onClick={generateCSV}>Generate the file to import on Mastodon</button>
                       <div>
-                      Now you can <a target="_blank" rel="noreferrer" href={`https://${mastodonId?.host}/settings/import`}>import and follow those accounts, all at once, here</a>.
+                      Now you can <a target="_blank" rel="noreferrer" href={`https://${mastodonId.host}/settings/import`}>import and follow those accounts, all at once, here</a>.
+                      <br/>
+                      Beware, the import process can <strong>take some time</strong> on your Mastodon instance.
                       </div>
                     </>
                     )
                   }
                 </>
+                ) : (
+                  <>
+                  You should add your @user@instance.social in your Twitter bio or username to help people find you on Mastodon.
+                  <label htmlFor="mastodon-handle">What is your Mastodon handle?</label>
+                  <input id="mastodon-handle" value={mastodonHandle} onChange={e => setMastodonHandle(e.target.value)} />
+                  <button onClick={explicitMastodonHandle}>Get the list of people you already follow on Mastodon</button>
+                  </>
                 )}
 
              </>
