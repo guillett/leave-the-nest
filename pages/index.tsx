@@ -1,7 +1,5 @@
 // @ts-nocheck
 import Head from "next/head"
-import Image from "next/image"
-import styles from "../styles/Home.module.css"
 
 import { useEffect, useState } from "react"
 import linkParser from "parse-link-header"
@@ -181,20 +179,21 @@ export default function Home() {
   }
 
   return (
-    <div className={styles.container}>
+    <div>
       <Head>
         <title>Leave the nest</title>
         <meta name="description" content="Leave Twitter peacefully" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>Leave Twitter peacefully!</h1>
+      <main>
+        <h1>Leave Twitter peacefully!</h1>
 
         <h2>1. Give us your Twitter handle</h2>
 
         <label htmlFor="twitter-handle">What is your Twitter handle?</label>
         <input
+          type="text"
           id="twitter-handle"
           value={twitterHandle}
           onKeyPress={(e) => {
@@ -224,41 +223,52 @@ export default function Home() {
 
         {twitterInfo && (
           <>
-            <button onClick={fetchTwitterFollowing}>
-              Get the list of people you follow on Twitter
-            </button>
+            <div className="section">
+              <button onClick={fetchTwitterFollowing}>
+                Get the list of people you follow on Twitter
+              </button>
 
-            {following && (
-              <>
+              {following && (
                 <div>
                   You follow {following?.data?.length} persons on Twitter and it
                   looks like{" "}
                   {following?.data?.filter((i) => i.mastodonIds.length).length}{" "}
                   are already on Mastodon.
                 </div>
-
+              )}
+            </div>
+            {following && (
+              <>
                 {mastodonId ? (
                   <>
-                    <button onClick={() => fetchMastodon(mastodonId)}>
-                      Get the list of people you already follow on Mastodon with{" "}
-                      {mastodonId.acct}
-                    </button>
+                    <div className="section">
+                      <button onClick={() => fetchMastodon(mastodonId)}>
+                        Get the list of people you already follow on Mastodon
+                        with {mastodonId.acct}
+                      </button>
+                      {onMastodonFollowing && (
+                        <div>
+                          You already follow{" "}
+                          {
+                            onMastodonFollowing?.filter(
+                              (i) => i.alreadyFollowedMastodonUser
+                            ).length
+                          }{" "}
+                          accounts but you are missing{" "}
+                          {
+                            onMastodonFollowing?.filter(
+                              (i) => !i.alreadyFollowedMastodonUser
+                            ).length
+                          }
+                          .
+                        </div>
+                      )}
+                    </div>
+
                     {onMastodonFollowing && (
                       <>
-                        You already follow{" "}
-                        {
-                          onMastodonFollowing?.filter(
-                            (i) => i.alreadyFollowedMastodonUser
-                          ).length
-                        }{" "}
-                        accounts but you are missing{" "}
-                        {
-                          onMastodonFollowing?.filter(
-                            (i) => !i.alreadyFollowedMastodonUser
-                          ).length
-                        }
-                        .
                         <button
+                          className="section"
                           onClick={() =>
                             generateCSV(
                               onMastodonFollowing?.filter(
@@ -269,16 +279,21 @@ export default function Home() {
                         >
                           Generate the file to import on Mastodon
                         </button>
-                        <button onClick={generateExplicitFollowList}>
+                        <button
+                          className="section"
+                          onClick={generateExplicitFollowList}
+                        >
                           Show the list of people to follow on Mastodon
                         </button>
+
                         {explicitFollowList && (
                           <>
                             <div>
                               Uncheck people to remove them from the generated
                               CSV.
                             </div>
-                            <div>
+                            <fieldset>
+                              <legend>Twitter people on Mastodon</legend>
                               {explicitFollowList.map((e, idx) => (
                                 <>
                                   <div key={e.username}>
@@ -303,8 +318,9 @@ export default function Home() {
                                   </div>
                                 </>
                               ))}
-                            </div>
+                            </fieldset>
                             <button
+                              className="section"
                               onClick={() => generateCSV(explicitFollowList)}
                             >
                               Generate the file to import these{" "}
@@ -316,40 +332,54 @@ export default function Home() {
                             </button>
                           </>
                         )}
+
                         <div>
-                          Now you can{" "}
-                          <a
-                            target="_blank"
-                            rel="noreferrer"
-                            href={`https://${mastodonId.host}/settings/import`}
-                          >
-                            import and follow those accounts, all at once, here
-                          </a>
-                          .
-                          <br />
-                          Beware, the import process can{" "}
-                          <strong>take some time</strong> on your Mastodon
-                          instance.
+                          <div>
+                            Now you can{" "}
+                            <a
+                              target="_blank"
+                              rel="noreferrer"
+                              href={`https://${mastodonId.host}/settings/import`}
+                            >
+                              import and follow those accounts, all at once,
+                              here
+                            </a>
+                            .
+                          </div>
+                          <div>
+                            Beware, the import process can{" "}
+                            <strong>take some time</strong> on your Mastodon
+                            instance.
+                          </div>
                         </div>
                       </>
                     )}
                   </>
                 ) : (
-                  <>
-                    You should add your @user@instance.social in your Twitter
-                    bio or username to help people find you on Mastodon.
-                    <label htmlFor="mastodon-handle">
-                      What is your Mastodon handle?
-                    </label>
-                    <input
-                      id="mastodon-handle"
-                      value={mastodonHandle}
-                      onChange={(e) => setMastodonHandle(e.target.value)}
-                    />
-                    <button onClick={explicitMastodonHandle}>
-                      Get the list of people you already follow on Mastodon
-                    </button>
-                  </>
+                  <div className="section">
+                    <div>
+                      You should add your @user@instance.social in your Twitter
+                      bio or username to help people find you on Mastodon.
+                    </div>
+                    <div>
+                      <label htmlFor="mastodon-handle">
+                        What is your Mastodon handle?
+                      </label>
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        id="mastodon-handle"
+                        value={mastodonHandle}
+                        onChange={(e) => setMastodonHandle(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <button onClick={explicitMastodonHandle}>
+                        Get the list of people you already follow on Mastodon
+                      </button>
+                    </div>
+                  </div>
                 )}
               </>
             )}
@@ -360,29 +390,21 @@ export default function Home() {
           3. Tell us how you want us to help you follow people that will move on
           Mastodon later!
         </h2>
+        {onMastodonFollowing && (
+          <>
+            <button disabled className="section">
+              Send me a message on Mastodon when an account I should follow is
+              created
+            </button>
 
-        <button disabled>
-          Send me a message on Mastodon when an account I should follow is
-          created
-        </button>
-
-        <button disabled>
-          Log me in on Mastodon to automatically follow new accounts
-        </button>
+            <button disabled className="section">
+              Log me in on Mastodon to automatically follow new accounts
+            </button>
+          </>
+        )}
       </main>
 
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{" "}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
+      <footer></footer>
     </div>
   )
 }

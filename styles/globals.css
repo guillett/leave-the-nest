@@ -1,9 +1,10 @@
 html,
 body {
   padding: 0;
-  margin: 0;
+  margin: auto;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  max-width: 1200px;
 }
 
 a {
@@ -22,4 +23,25 @@ a {
     color: white;
     background: black;
   }
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+h2 {
+  margin: 1em 0 0.5em 0;
+}
+
+button,
+input[type="text"] {
+  padding: 0.5em 1em;
+  font-size: large;
+}
+
+.section {
+  /*border: solid black;*/
+  margin: 1em 0;
 }
