@@ -117,7 +117,7 @@ export default function Home() {
       const key = v.acct.includes("@")
         ? `@${v.acct}`
         : `@${v.acct}@${mastodonId.host}`
-      a[key] = v
+      a[key.toLowerCase()] = v
       return a
     }, {})
 
@@ -125,7 +125,12 @@ export default function Home() {
       (i) => i.mastodonIds.length
     )
     followedMastodonUsers.forEach((u) => {
-      u.alreadyFollowedMastodonUser = mastodonUserMap[u.mastodonIds[0]]
+      u.alreadyFollowedMastodonUser =
+        mastodonUserMap[
+          u.mastodonIds
+            .find((i) => i && mastodonUserMap[i?.toLowerCase?.()])
+            ?.toLowerCase?.()
+        ]
     })
 
     setOnMastodonFollowing(followedMastodonUsers)
