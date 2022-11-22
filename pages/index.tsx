@@ -4,6 +4,7 @@ import Image from "next/image"
 import styles from "../styles/Home.module.css"
 
 import { useEffect, useState } from "react"
+import linkParser from "parse-link-header"
 
 import { addMastodonHandles } from "../lib/twitter.ts"
 
@@ -89,12 +90,29 @@ export default function Home() {
     )
     const json_l = await response_l.json()
 
-    const response_f = await fetch(
-      `https://${mastodonId.host}/api/v1/accounts/${json_l.id}/following?limit=1000`
-    )
-    const json_f = await response_f.json()
+    const todo = [
+      [
+        `https://${mastodonId.host}/api/v1/accounts/${json_l.id}/following?limit=1000`,
+        ["prev", "next"],
+      ],
+    ]
+    const results = []
+    while (todo.length) {
+      const [uri, directions] = todo.shift()
+      const response_f = await fetch(uri)
+      const links = linkParser(response_f.headers.get("link"))
+      directions.forEach((d) => {
+        if (links?.[d]) {
+          todo.push([links[d].url, [d]])
+        }
+      })
+      const json_f = await response_f.json()
+      results.push(json_f)
+    }
 
-    const mastodonUserMap = json_f.reduce((a, v) => {
+    const fullResult = [].concat(...results)
+
+    const mastodonUserMap = fullResult.reduce((a, v) => {
       const key = v.acct.includes("@")
         ? `@${v.acct}`
         : `@${v.acct}@${mastodonId.host}`
