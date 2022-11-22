@@ -15,6 +15,7 @@ export default function Home() {
   const [mastodonHandle, setMastodonHandle] = useState("")
   const [mastodonId, setMastodonId] = useState()
   const [onMastodonFollowing, setOnMastodonFollowing] = useState()
+  const [explicitFollowList, setExplicitFollowList] = useState()
 
   const getAccount = (fullname) => {
     const comps = fullname.split("@")
@@ -130,20 +131,8 @@ export default function Home() {
     setOnMastodonFollowing(followedMastodonUsers)
   }
 
-  const generateCSV = () => {
-    const dd = onMastodonFollowing.reduce((a, v) => {
-      v.mastodonIds.forEach((i) => {
-        const { host } = getAccount(i)
-        a[host] = a[host] || []
-        a[host].push(i)
-      })
-      return a
-    }, {})
-
-    const toF = onMastodonFollowing?.filter(
-      (i) => !i.alreadyFollowedMastodonUser
-    )
-    const accounts = toF.map((i) => {
+  const generateCSV = (list) => {
+    const accounts = list.map((i) => {
       const { acct } = getAccount(i.mastodonIds[0])
       return acct
     })
@@ -165,6 +154,25 @@ export default function Home() {
 
     document.body.removeChild(link)
     window.URL.revokeObjectURL(url)
+  }
+
+  const generateExplicitFollowList = () => {
+    setExplicitFollowList(
+      onMastodonFollowing
+        ?.filter((i) => !i.alreadyFollowedMastodonUser)
+        .map((e) => {
+          return {
+            ...e,
+            checked: true,
+          }
+        })
+    )
+  }
+
+  const updateCheck = (idx, old) => {
+    const newList = [...explicitFollowList]
+    newList[idx].checked = !old
+    setExplicitFollowList(newList)
   }
 
   return (
@@ -245,9 +253,64 @@ export default function Home() {
                           ).length
                         }
                         .
-                        <button onClick={generateCSV}>
+                        <button
+                          onClick={() =>
+                            generateCSV(
+                              onMastodonFollowing?.filter(
+                                (i) => !i.alreadyFollowedMastodonUser
+                              )
+                            )
+                          }
+                        >
                           Generate the file to import on Mastodon
                         </button>
+                        <button onClick={generateExplicitFollowList}>
+                          Show the list of people to follow on Mastodon
+                        </button>
+                        {explicitFollowList && (
+                          <>
+                            <div>
+                              Uncheck people to remove them from the generated
+                              CSV.
+                            </div>
+                            <div>
+                              {explicitFollowList.map((e, idx) => (
+                                <>
+                                  <div key={e.username}>
+                                    <input
+                                      type="checkbox"
+                                      id={`checkbox_${e.username}`}
+                                      checked={e.checked}
+                                      onChange={() =>
+                                        updateCheck(idx, e.checked)
+                                      }
+                                    />
+                                    <label htmlFor={`checkbox_${e.username}`}>
+                                      <a
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        href={`https://twitter.com/${e.username}`}
+                                      >
+                                        {e.username}
+                                      </a>
+                                    </label>{" "}
+                                    - {e.name} - {e.description}
+                                  </div>
+                                </>
+                              ))}
+                            </div>
+                            <button
+                              onClick={() => generateCSV(explicitFollowList)}
+                            >
+                              Generate the file to import these{" "}
+                              {
+                                explicitFollowList.filter((e) => e.checked)
+                                  .length
+                              }{" "}
+                              people on Mastodon
+                            </button>
+                          </>
+                        )}
                         <div>
                           Now you can{" "}
                           <a
