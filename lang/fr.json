@@ -1,0 +1,77 @@
+{
+  "application-cta": {
+    "defaultMessage": "Me connecter à Mastodon pour suivre automatiquement les nouveaux comptes"
+  },
+  "csv-cta": {
+    "defaultMessage": "Générer le fichier à importer dans Mastodon"
+  },
+  "csv-import-explanation": {
+    "defaultMessage": "Vous pouvez désormais <a>importer pour suivre les comptes identifiés</a>."
+  },
+  "csv-import-warning": {
+    "defaultMessage": "Attention, le processus d'importation peut <strong>prendre un peu de temps</strong> sur votre instance Mastodon."
+  },
+  "direct-message-cta": {
+    "defaultMessage": "Recevoir un direct message sur Mastodon quand un compte que je suis sur Twitter est identifié sur Mastodon"
+  },
+  "explicit-list-csv-cta": {
+    "defaultMessage": "Générer le fichier à importer dans Mastodon pour ces {count} personnes"
+  },
+  "explicit-list-cta": {
+    "defaultMessage": "Récupérer la liste des personnes que vous suivez sur Mastodon"
+  },
+  "list-explanation": {
+    "defaultMessage": "Décocher les personnes que vous ne souhaitez pas intéger au fichier généré."
+  },
+  "list-title": {
+    "defaultMessage": "Personnes suivies sur Twitter avec un compte sur Mastodon"
+  },
+  "mastodon-following-counts": {
+    "defaultMessage": "Vous suivez déjà {total} comptes mais il vous en manque {alreadyFollowed}."
+  },
+  "mastodon-following-cta": {
+    "defaultMessage": "Obtenir la liste des personnes déjà suivies sur Mastodon avec {acct}"
+  },
+  "mastodon-handle-comment": {
+    "defaultMessage": "Vous devriez ajouter votre @nom@instance.social dans votre profil Twitter ou votre nom pour aider les personnes à vous retrouver sur Mastodon."
+  },
+  "mastodon-handle-question": {
+    "defaultMessage": "Quel est votre compte Mastodon ?"
+  },
+  "show-list-cta": {
+    "defaultMessage": "Afficher la liste des comptes à suivre sur Mastodon"
+  },
+  "step1": {
+    "defaultMessage": "1. Dites-nous quel est votre compte Twitter"
+  },
+  "step2": {
+    "defaultMessage": "2. Suivez les personnes déjà sur Mastodon"
+  },
+  "step3": {
+    "defaultMessage": "3. Dites-nous comment vous souhaitez suivre les personnes que viendront sur Mastodon plus tard !"
+  },
+  "title": {
+    "defaultMessage": "Quittons Twitter sereinement!"
+  },
+  "twitter-following-counts": {
+    "defaultMessage": "Vous suivez {total} personnes sur Twitter et {onMastodon} semblent déjà sur Mastodon."
+  },
+  "twitter-following-cta": {
+    "defaultMessage": "Récupérer la liste des personnes que vous suivez sur Twitter"
+  },
+  "twitter-handle-cta": {
+    "defaultMessage": "Récupérer les infos de votre compte Twitter"
+  },
+  "twitter-handle-question": {
+    "defaultMessage": "Quel est votre compte Twitter ?"
+  },
+  "twitter-mastodon-account": {
+    "defaultMessage": "Nous avons trouvé votre compte Mastodon : ''{acct}''"
+  },
+  "twitter-mastodon-account-not-found": {
+    "defaultMessage": "Nous n'avons pas réussi à récupérer votre compte Mastodon."
+  },
+  "twitter-name": {
+    "defaultMessage": "Nous vous avons trouvé sur Twitter, votre nom y est : ''{name}''"
+  }
+}

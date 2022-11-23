@@ -1,0 +1,77 @@
+{
+  "application-cta": {
+    "defaultMessage": "Log me in on Mastodon to automatically follow new accounts"
+  },
+  "csv-cta": {
+    "defaultMessage": "Generate the file to import on Mastodon"
+  },
+  "csv-import-explanation": {
+    "defaultMessage": "Now you can <a>import and follow those accounts, all at once, here</a>."
+  },
+  "csv-import-warning": {
+    "defaultMessage": "Beware, the import process can <strong>take some time</strong> on your Mastodon instance."
+  },
+  "direct-message-cta": {
+    "defaultMessage": "Send me a message on Mastodon when an account I should follow is created"
+  },
+  "explicit-list-csv-cta": {
+    "defaultMessage": "Generate the file to import these {count} people on Mastodon"
+  },
+  "explicit-list-cta": {
+    "defaultMessage": "Get the list of people you already follow on Mastodon"
+  },
+  "list-explanation": {
+    "defaultMessage": "Uncheck people to remove them from the generated CSV."
+  },
+  "list-title": {
+    "defaultMessage": "Twitter people on Mastodon"
+  },
+  "mastodon-following-counts": {
+    "defaultMessage": "You already follow {total} accounts but you are missing {alreadyFollowed}."
+  },
+  "mastodon-following-cta": {
+    "defaultMessage": "Get the list of people you already follow on Mastodon with {acct}"
+  },
+  "mastodon-handle-comment": {
+    "defaultMessage": "You should add your @user@instance.social in your Twitter bio or username to help people find you on Mastodon."
+  },
+  "mastodon-handle-question": {
+    "defaultMessage": "What is your Mastodon handle?"
+  },
+  "show-list-cta": {
+    "defaultMessage": "Show the list of people to follow on Mastodon"
+  },
+  "step1": {
+    "defaultMessage": "1. Give us your Twitter handle"
+  },
+  "step2": {
+    "defaultMessage": "2. Follow people that are already on Mastodon"
+  },
+  "step3": {
+    "defaultMessage": "3. Tell us how you want us to help you follow people that will move on Mastodon later!"
+  },
+  "title": {
+    "defaultMessage": "Leave Twitter peacefully!"
+  },
+  "twitter-following-counts": {
+    "defaultMessage": "You follow {total} persons on Twitter and it looks like are already on Mastodon."
+  },
+  "twitter-following-cta": {
+    "defaultMessage": "Get the list of people you follow on Twitter"
+  },
+  "twitter-handle-cta": {
+    "defaultMessage": "Get your info on Twitter"
+  },
+  "twitter-handle-question": {
+    "defaultMessage": "What is your Twitter handle?"
+  },
+  "twitter-mastodon-account": {
+    "defaultMessage": "We managed to extract your Mastodon account: '{acct}'"
+  },
+  "twitter-mastodon-account-not-found": {
+    "defaultMessage": "We didn't managed a Mastodon account from your public data."
+  },
+  "twitter-name": {
+    "defaultMessage": "We found you on Twitter, your name is: '{name}'"
+  }
+}

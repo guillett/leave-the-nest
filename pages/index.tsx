@@ -1,8 +1,8 @@
 // @ts-nocheck
 import Head from "next/head"
-
-import { useEffect, useState } from "react"
 import linkParser from "parse-link-header"
+import { useEffect, useState } from "react"
+import { FormattedMessage } from "react-intl"
 
 import { addMastodonHandles } from "../lib/twitter.ts"
 
@@ -178,6 +178,19 @@ export default function Home() {
     setExplicitFollowList(newList)
   }
 
+  const MastodonLink = ({ data }) => {
+    const mastodon = getAccount(data.mastodonIds[0])
+    return (
+      <a
+        target="_blank"
+        rel="noreferrer"
+        href={`https://${mastodon.host}/${mastodon.user}`}
+      >
+        {mastodon.acct}
+      </a>
+    )
+  }
+
   return (
     <div>
       <Head>
@@ -187,11 +200,25 @@ export default function Home() {
       </Head>
 
       <main>
-        <h1>Leave Twitter peacefully!</h1>
+        <h1>
+          <FormattedMessage
+            id="title"
+            defaultMessage="Leave Twitter peacefully!"
+          />
+        </h1>
+        <h2>
+          <FormattedMessage
+            id="step1"
+            defaultMessage="1. Give us your Twitter handle"
+          />
+        </h2>
 
-        <h2>1. Give us your Twitter handle</h2>
-
-        <label htmlFor="twitter-handle">What is your Twitter handle?</label>
+        <label htmlFor="twitter-handle">
+          <FormattedMessage
+            id="twitter-handle-question"
+            defaultMessage="What is your Twitter handle?"
+          />
+        </label>
         <input
           type="text"
           id="twitter-handle"
@@ -203,37 +230,68 @@ export default function Home() {
           }}
           onChange={(e) => setTwitterHandle(e.target.value)}
         />
-        <button onClick={fetchTwitterInfo}>Get your info on Twitter</button>
+        <button onClick={fetchTwitterInfo}>
+          <FormattedMessage
+            id="twitter-handle-cta"
+            defaultMessage="Get your info on Twitter"
+          />
+        </button>
 
         {twitterInfo && (
           <>
             <div>
-              We found you on Twitter, your name is: &quot;
-              {twitterInfo?.data?.[0]?.name}&quot;
+              <FormattedMessage
+                id="twitter-name"
+                defaultMessage="We found you on Twitter, your name is: ''{name}''"
+                values={{ name: twitterInfo?.data?.[0]?.name }}
+              />
             </div>
             <div>
-              {mastodonId && !mastodonHandle.length
-                ? `We managed to extract your Mastodon account: "${mastodonId.acct}"`
-                : `We didn't managed a Mastodon account from your public data.`}
+              {mastodonId && !mastodonHandle.length ? (
+                <FormattedMessage
+                  id="twitter-mastodon-account"
+                  defaultMessage="We managed to extract your Mastodon account: ''{acct}'"
+                  values={{ acct: mastodonId.acct }}
+                />
+              ) : (
+                <FormattedMessage
+                  id="twitter-mastodon-account-not-found"
+                  defaultMessage="We didn't managed a Mastodon account from your public data."
+                />
+              )}
             </div>
           </>
         )}
 
-        <h2>2. Follow people that are already on Mastodon</h2>
+        <h2>
+          <FormattedMessage
+            id="step2"
+            defaultMessage="2. Follow people that are already on Mastodon"
+          />
+        </h2>
 
         {twitterInfo && (
           <>
             <div className="section">
               <button onClick={fetchTwitterFollowing}>
-                Get the list of people you follow on Twitter
+                <FormattedMessage
+                  id="twitter-following-cta"
+                  defaultMessage="Get the list of people you follow on Twitter"
+                />
               </button>
 
               {following && (
                 <div>
-                  You follow {following?.data?.length} persons on Twitter and it
-                  looks like{" "}
-                  {following?.data?.filter((i) => i.mastodonIds.length).length}{" "}
-                  are already on Mastodon.
+                  <FormattedMessage
+                    id="twitter-following-counts"
+                    defaultMessage="You follow {total} persons on Twitter and it looks like {onMastodon} are already on Mastodon."
+                    values={{
+                      total: following?.data?.length,
+                      onMastodon: following?.data?.filter(
+                        (i) => i.mastodonIds.length
+                      ).length,
+                    }}
+                  />
                 </div>
               )}
             </div>
@@ -243,24 +301,26 @@ export default function Home() {
                   <>
                     <div className="section">
                       <button onClick={() => fetchMastodon(mastodonId)}>
-                        Get the list of people you already follow on Mastodon
-                        with {mastodonId.acct}
+                        <FormattedMessage
+                          id="mastodon-following-cta"
+                          defaultMessage="Get the list of people you already follow on Mastodon with {acct}"
+                          values={{ acct: mastodonId.acct }}
+                        />
                       </button>
                       {onMastodonFollowing && (
                         <div>
-                          You already follow{" "}
-                          {
-                            onMastodonFollowing?.filter(
-                              (i) => i.alreadyFollowedMastodonUser
-                            ).length
-                          }{" "}
-                          accounts but you are missing{" "}
-                          {
-                            onMastodonFollowing?.filter(
-                              (i) => !i.alreadyFollowedMastodonUser
-                            ).length
-                          }
-                          .
+                          <FormattedMessage
+                            id="mastodon-following-counts"
+                            defaultMessage="You already follow {total} accounts but you are missing {alreadyFollowed}."
+                            values={{
+                              total: onMastodonFollowing?.filter(
+                                (i) => i.alreadyFollowedMastodonUser
+                              ).length,
+                              alreadyFollowed: onMastodonFollowing?.filter(
+                                (i) => !i.alreadyFollowedMastodonUser
+                              ).length,
+                            }}
+                          />
                         </div>
                       )}
                     </div>
@@ -277,79 +337,103 @@ export default function Home() {
                             )
                           }
                         >
-                          Generate the file to import on Mastodon
+                          <FormattedMessage
+                            id="csv-cta"
+                            defaultMessage="Generate the file to import on Mastodon"
+                          />
                         </button>
                         <button
                           className="section"
                           onClick={generateExplicitFollowList}
                         >
-                          Show the list of people to follow on Mastodon
+                          <FormattedMessage
+                            id="show-list-cta"
+                            defaultMessage="Show the list of people to follow on Mastodon"
+                          />
                         </button>
 
                         {explicitFollowList && (
                           <>
                             <div>
-                              Uncheck people to remove them from the generated
-                              CSV.
+                              <FormattedMessage
+                                id="list-explanation"
+                                defaultMessage="Uncheck people to remove them from the generated CSV."
+                              />
                             </div>
                             <fieldset>
-                              <legend>Twitter people on Mastodon</legend>
+                              <legend>
+                                <FormattedMessage
+                                  id="list-title"
+                                  defaultMessage="Twitter people on Mastodon"
+                                />
+                              </legend>
                               {explicitFollowList.map((e, idx) => (
-                                <>
-                                  <div key={e.username}>
-                                    <input
-                                      type="checkbox"
-                                      id={`checkbox_${e.username}`}
-                                      checked={e.checked}
-                                      onChange={() =>
-                                        updateCheck(idx, e.checked)
-                                      }
-                                    />
-                                    <label htmlFor={`checkbox_${e.username}`}>
-                                      <a
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        href={`https://twitter.com/${e.username}`}
-                                      >
-                                        {e.username}
-                                      </a>
-                                    </label>{" "}
-                                    - {e.name} - {e.description}
-                                  </div>
-                                </>
+                                <div key={e.username}>
+                                  <input
+                                    type="checkbox"
+                                    id={`checkbox_${e.username}`}
+                                    checked={e.checked}
+                                    onChange={() => updateCheck(idx, e.checked)}
+                                  />
+                                  <label htmlFor={`checkbox_${e.username}`}>
+                                    <a
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      href={`https://twitter.com/${e.username}`}
+                                    >
+                                      {e.username}@twitter.com
+                                    </a>
+                                    {" - "}
+                                    <MastodonLink data={e} /> - {e.name} -{" "}
+                                    {e.description}
+                                  </label>
+                                </div>
                               ))}
                             </fieldset>
                             <button
                               className="section"
                               onClick={() => generateCSV(explicitFollowList)}
                             >
-                              Generate the file to import these{" "}
-                              {
-                                explicitFollowList.filter((e) => e.checked)
-                                  .length
-                              }{" "}
-                              people on Mastodon
+                              <FormattedMessage
+                                id="explicit-list-csv-cta"
+                                defaultMessage="Generate the file to import these {count} people on Mastodon"
+                                values={{
+                                  count: explicitFollowList.filter(
+                                    (e) => e.checked
+                                  ).length,
+                                }}
+                              />
                             </button>
                           </>
                         )}
 
                         <div>
                           <div>
-                            Now you can{" "}
-                            <a
-                              target="_blank"
-                              rel="noreferrer"
-                              href={`https://${mastodonId.host}/settings/import`}
-                            >
-                              import and follow those accounts, all at once,
-                              here
-                            </a>
-                            .
+                            <FormattedMessage
+                              id="csv-import-explanation"
+                              defaultMessage="Now you can <a>import and follow those accounts, all at once, here</a>."
+                              values={{
+                                a: (chunks) => (
+                                  <a
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    href={`https://${mastodonId.host}/settings/import`}
+                                  >
+                                    {chunks}
+                                  </a>
+                                ),
+                              }}
+                            />
                           </div>
                           <div>
-                            Beware, the import process can{" "}
-                            <strong>take some time</strong> on your Mastodon
-                            instance.
+                            <FormattedMessage
+                              id="csv-import-warning"
+                              defaultMessage="Beware, the import process can <strong>take some time</strong> on your Mastodon
+                            instance."
+                              values={{
+                                strong: (chunks) => <strong>{chunks}</strong>,
+                              }}
+                            />
                           </div>
                         </div>
                       </>
@@ -358,12 +442,17 @@ export default function Home() {
                 ) : (
                   <div className="section">
                     <div>
-                      You should add your @user@instance.social in your Twitter
-                      bio or username to help people find you on Mastodon.
+                      <FormattedMessage
+                        id="mastodon-handle-comment"
+                        defaultMessage="You should add your @user@instance.social in your Twitter bio or username to help people find you on Mastodon."
+                      />
                     </div>
                     <div>
                       <label htmlFor="mastodon-handle">
-                        What is your Mastodon handle?
+                        <FormattedMessage
+                          id="mastodon-handle-question"
+                          defaultMessage="What is your Mastodon handle?"
+                        />
                       </label>
                     </div>
                     <div>
@@ -376,7 +465,10 @@ export default function Home() {
                     </div>
                     <div>
                       <button onClick={explicitMastodonHandle}>
-                        Get the list of people you already follow on Mastodon
+                        <FormattedMessage
+                          id="explicit-list-cta"
+                          defaultMessage="Get the list of people you already follow on Mastodon"
+                        />
                       </button>
                     </div>
                   </div>
@@ -387,18 +479,25 @@ export default function Home() {
         )}
 
         <h2>
-          3. Tell us how you want us to help you follow people that will move on
-          Mastodon later!
+          <FormattedMessage
+            id="step3"
+            defaultMessage="3. Tell us how you want us to help you follow people that will move on Mastodon later!"
+          />
         </h2>
         {onMastodonFollowing && (
           <>
             <button disabled className="section">
-              Send me a message on Mastodon when an account I should follow is
-              created
+              <FormattedMessage
+                id="direct-message-cta"
+                defaultMessage="Send me a message on Mastodon when an account I should follow is created"
+              />
             </button>
 
             <button disabled className="section">
-              Log me in on Mastodon to automatically follow new accounts
+              <FormattedMessage
+                id="application-cta"
+                defaultMessage="Log me in on Mastodon to automatically follow new accounts"
+              />
             </button>
           </>
         )}
