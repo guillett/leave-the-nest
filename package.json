@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "compile:fr && next build",
+    "build": "npm run compile:fr && next build",
     "start": "next start -p $PORT",
     "lint": "next lint",
     "format:staged": "pretty-quick --staged",
