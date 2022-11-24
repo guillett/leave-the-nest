@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { FormattedMessage } from "react-intl"
 
 import { addMastodonHandles } from "../lib/twitter.ts"
+import { getAccount } from "../lib/mastodon.ts"
 
 export default function Home() {
   const [twitterHandle, setTwitterHandle] = useState("1h0ma5")
@@ -14,18 +15,6 @@ export default function Home() {
   const [mastodonId, setMastodonId] = useState()
   const [onMastodonFollowing, setOnMastodonFollowing] = useState()
   const [explicitFollowList, setExplicitFollowList] = useState()
-
-  const getAccount = (fullname) => {
-    const comps = fullname.split("@")
-    if (!comps[0].length) {
-      comps.shift()
-    }
-    return {
-      user: comps?.[0],
-      host: comps?.[1],
-      acct: `${comps?.[0]}@${comps?.[1]}`,
-    }
-  }
 
   const fetchTwitterInfo = () => {
     fetch(`/api/twitter/details/${twitterHandle}`)
@@ -112,9 +101,7 @@ export default function Home() {
     const fullResult = [].concat(...results)
 
     const mastodonUserMap = fullResult.reduce((a, v) => {
-      const key = v.acct.includes("@")
-        ? `@${v.acct}`
-        : `@${v.acct}@${mastodonId.host}`
+      const key = v.acct.includes("@") ? v.acct : `${v.acct}@${mastodonId.host}`
       a[key.toLowerCase()] = v
       return a
     }, {})
@@ -160,16 +147,15 @@ export default function Home() {
   }
 
   const generateExplicitFollowList = () => {
-    setExplicitFollowList(
-      onMastodonFollowing
-        ?.filter((i) => !i.alreadyFollowedMastodonUser)
-        .map((e) => {
-          return {
-            ...e,
-            checked: true,
-          }
-        })
-    )
+    const list = onMastodonFollowing
+      ?.filter((i) => !i.alreadyFollowedMastodonUser)
+      .map((e) => {
+        return {
+          ...e,
+          checked: true,
+        }
+      })
+    setExplicitFollowList(list)
   }
 
   const updateCheck = (idx, old) => {
@@ -184,7 +170,7 @@ export default function Home() {
       <a
         target="_blank"
         rel="noreferrer"
-        href={`https://${mastodon.host}/${mastodon.user}`}
+        href={`https://${mastodon.host}/@${mastodon.user}`}
       >
         {mastodon.acct}
       </a>
