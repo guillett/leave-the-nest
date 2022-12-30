@@ -4,24 +4,7 @@ import type { NextApiRequest, NextApiResponse } from "next"
 import * as bluebird from "bluebird"
 
 import clientPromise from "../../../lib/mongodb.ts"
-
-function timeout(ms, promise) {
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => {
-      reject(new Error("TIMEOUT"))
-    }, ms)
-
-    promise
-      .then((value) => {
-        clearTimeout(timer)
-        resolve(value)
-      })
-      .catch((reason) => {
-        clearTimeout(timer)
-        reject(reason)
-      })
-  })
-}
+import { timeout } from "../../../lib/timeout.ts"
 
 export default async function handler(
   req: NextApiRequest,
