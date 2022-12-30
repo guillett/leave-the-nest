@@ -38,6 +38,9 @@
   "mastodon-handle-question": {
     "defaultMessage": "Quel est votre compte Mastodon ?"
   },
+  "open-source-comment": {
+    "defaultMessage": "Le code de ce service est <a>open-source</a>. N'hésitez pas à contribuer ou à <me>me contacter</me> en cas de problème."
+  },
   "show-list-cta": {
     "defaultMessage": "Afficher la liste des comptes à suivre sur Mastodon"
   },

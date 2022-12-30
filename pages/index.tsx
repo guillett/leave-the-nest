@@ -489,7 +489,43 @@ export default function Home() {
         )}
       </main>
 
-      <footer></footer>
+      <footer>
+        <p>
+          <FormattedMessage
+            id="open-source-comment"
+            defaultMessage="This service is <a>open-source</a>. Feel free to contribute and please let me <me>@guillett@mamot.fr</me> know if it is bogus."
+            values={{
+              a: (c) => (
+                <a
+                  target="_blank"
+                  rel="noreferrer"
+                  href="https://github.com/guillett/leave-the-nest"
+                >
+                  {c}
+                </a>
+              ),
+              me: (c) =>
+                mastodonId ? (
+                  <a
+                    target="_blank"
+                    rel="noreferrer"
+                    href={`https://${mastodonId.host}/@guillett@mamot.fr`}
+                  >
+                    {c}
+                  </a>
+                ) : (
+                  <a
+                    target="_blank"
+                    rel="noreferrer"
+                    href={`https://mamot.fr/@guillett`}
+                  >
+                    {c}
+                  </a>
+                ),
+            }}
+          />
+        </p>
+      </footer>
     </div>
   )
 }
