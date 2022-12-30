@@ -1,11 +1,14 @@
 // @ts-nocheck
+import * as bluebird from "bluebird"
 import Head from "next/head"
+import { signIn, signOut } from "next-auth/react"
 import linkParser from "parse-link-header"
 import { useEffect, useState } from "react"
 import { FormattedMessage } from "react-intl"
 
-import { addMastodonHandles } from "../lib/twitter.ts"
 import { getAccount } from "../lib/mastodon.ts"
+import { addMastodonHandles } from "../lib/twitter.ts"
+import { timeout } from "../lib/timeout.ts"
 
 export default function Home() {
   const [twitterHandle, setTwitterHandle] = useState("1h0ma5")
@@ -32,6 +35,28 @@ export default function Home() {
         } else {
           setMastodonId()
         }
+      })
+  }
+
+  const test = () => {
+    const d = new FormData()
+
+    d.set("status", "test2 @guillett@mamot.fr")
+    d.set("visibility", "direct")
+    return fetch("https://mapstodon.space/api/v1/statuses", {
+      //    return fetch("https://mamot.fr/api/v1/statuses", {
+      method: "post",
+      headers: {
+        //        authorization: `bearer ${process.env.BEARER_2}`,
+        //        authorization: `bearer ${process.env.MAMOT_TOKEN}`,
+        //        authorization: `bearer ${process.env.BEARER_1}`,
+        //        authorization: `bearer ${process.env.MASTODON_SOCIAL_TOKEN}`
+      },
+      body: d,
+    })
+      .then((r) => r.json())
+      .catch((error) => {
+        res.json({ error })
       })
   }
 
@@ -175,6 +200,49 @@ export default function Home() {
         {mastodon.acct}
       </a>
     )
+  }
+
+  const getData = () => {
+    bluebird
+      .map(
+        false ? explicitFollowList : [],
+        (user) => {
+          const url = `https://${mastodonId.host}/api/v1/accounts/lookup?acct=@${user.mastodonIds[0]}`
+          return timeout(3000, fetch(url))
+            .then((r) => r.json())
+            .catch((error) => {
+              console.log("error", error)
+              return { error: error.toString() }
+            })
+            .then((result) => {
+              return {
+                result,
+                user,
+              }
+            })
+        },
+        { concurrency: 3 }
+      )
+      .then((results) => {
+        const bogus = results.filter((i) => !i.result.id)
+        console.log("bogus", bogus)
+        const found = results.filter((i) => i.result.id)
+        console.log("found", found)
+
+        const o = new URLSearchParams()
+        found.forEach((i) => {
+          o.append("id[]", i.result.id)
+        })
+
+        const ids = "id[]=41699&id[]=109207644661915522&id[]=170&id[]=1866"
+        //const ids = o.toString()
+
+        fetch("/api/mastodon/relationships?" + ids)
+          .then((r) => r.json())
+          .then((r) => {
+            console.log(r)
+          })
+      })
   }
 
   return (
@@ -488,6 +556,11 @@ export default function Home() {
           </>
         )}
       </main>
+
+      <button onClick={() => test()}>test</button>
+      <button onClick={() => signIn()}>signIn</button>
+      <button onClick={() => signOut()}>signOut</button>
+      <button onClick={() => getData()}>getData</button>
 
       <footer>
         <p>

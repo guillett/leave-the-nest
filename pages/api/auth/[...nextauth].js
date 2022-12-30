@@ -31,7 +31,7 @@ export const authOptions = {
       type: "oauth",
       authorization: {
         url: "https://mamot.fr/oauth/authorize",
-        params: { scope: "read" },
+        params: { scope: "follow read write" },
       },
       token: "https://mamot.fr/oauth/token",
       userinfo: "https://mamot.fr/api/v1/accounts/verify_credentials",
@@ -40,6 +40,27 @@ export const authOptions = {
       profile(profile) {
         return {
           email: profile.username + "@mastodon@mamot.fr",
+          id: profile.id,
+          image: profile.avatar,
+          username: profile.username,
+        }
+      },
+    },
+    {
+      id: "mastodon@mapstodon.space",
+      name: "Mastodon@mapstodon.space",
+      type: "oauth",
+      authorization: {
+        url: "https://mapstodon.space/oauth/authorize",
+        params: { scope: "follow read write" },
+      },
+      token: "https://mapstodon.space/oauth/token",
+      userinfo: "https://mapstodon.space/api/v1/accounts/verify_credentials",
+      clientId: process.env.MASTODON_SOCIAL_ID,
+      clientSecret: process.env.MASTODON_SOCIAL_SECRET,
+      profile(profile) {
+        return {
+          email: profile.username + "@mastodon@mapstodon.space",
           id: profile.id,
           image: profile.avatar,
           username: profile.username,
